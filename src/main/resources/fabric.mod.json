@@ -53,6 +53,9 @@
       "links": {
         "modmenu.discord": "https://discord.gg/vPyUBcdmZV"
       }
+    },
+    "lithium:options": {
+      "mixin.block.hopper": false
     }
   }
 }
