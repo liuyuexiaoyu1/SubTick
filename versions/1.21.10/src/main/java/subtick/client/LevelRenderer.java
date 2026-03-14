@@ -266,7 +266,11 @@ public class LevelRenderer
         @Override
         public VertexConsumer getBuffer(RenderType renderType) {
             OutlineBufferSource outlineBufferSource = Minecraft.getInstance().renderBuffers().outlineBufferSource();
+            //#if MC >= 12111
+            //$$ VertexConsumer vertexConsumer = outlineBufferSource.getBuffer(RenderTypes.outline(TextureAtlas.LOCATION_BLOCKS));
+            //#else
             VertexConsumer vertexConsumer = outlineBufferSource.getBuffer(RenderType.outline(TextureAtlas.LOCATION_BLOCKS));
+            //#endif
             return vertexConsumer;
         }
     }
