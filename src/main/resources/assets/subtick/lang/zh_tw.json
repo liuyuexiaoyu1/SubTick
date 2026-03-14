@@ -7,7 +7,6 @@
   "carpet.rule.subtickPhaseFormat.desc": "SubTick 訊息中刻階段的格式（使用 Carpet 格式，參見 https://github.com/gnembon/fabric-carpet/blob/master/docs/scarpet/api/Auxiliary.md     中的 \"format(components, ...)\"）",
   "carpet.rule.subtickDimensionFormat.desc": "SubTick 訊息中維度的格式（使用 Carpet 格式，參見 https://github.com/gnembon/fabric-carpet/blob/master/docs/scarpet/api/Auxiliary.md     中的 \"format(components, ...)\"）",
   "carpet.rule.subtickErrorFormat.desc": "SubTick 訊息中錯誤文字的格式（使用 Carpet 格式，參見 https://github.com/gnembon/fabric-carpet/blob/master/docs/scarpet/api/Auxiliary.md     中的 \"format(components, ...)\"）",
-  "carpet.rule.subtickHighlightColor.desc": "SubTick queueStep 高亮顯示的顏色",
   "carpet.rule.subtickDefaultRange.desc": "queueStep 的執行範圍",
   "subtick.tickPhase.worldBorder":      "World Border",
   "subtick.tickPhase.weather":          "Weather",
@@ -50,5 +49,6 @@
   "carpet.rule.subtickPhaseFormat.name": "階段文本格式",
   "carpet.rule.subtickDimensionFormat.name": "維度文本格式",
   "carpet.rule.subtickErrorFormat.name": "錯誤文本格式",
-  "carpet.rule.subtickDefaultRange.name": "默認範圍"
+  "carpet.rule.subtickDefaultRange.name": "默認範圍",
+  "subtick.hovermessage.tips":"點擊複製完整堆疊"
 }

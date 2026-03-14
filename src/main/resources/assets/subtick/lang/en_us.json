@@ -59,5 +59,6 @@
   "carpet.rule.subtickPhaseFormat.desc": "Text format for phases in subtick message feedback (Uses carpet format, search for \"format(components, ...)\" in https://github.com/gnembon/fabric-carpet/blob/master/docs/scarpet/api/Auxiliary.md)",
   "carpet.rule.subtickDimensionFormat.desc": "Text format for dimensions in subtick message feedback (Uses carpet format, search for \"format(components, ...)\" in https://github.com/gnembon/fabric-carpet/blob/master/docs/scarpet/api/Auxiliary.md)",
   "carpet.rule.subtickErrorFormat.desc": "Error text format for normal text in subtick message feedback (Uses carpet format, search for \"format(components, ...)\" in https://github.com/gnembon/fabric-carpet/blob/master/docs/scarpet/api/Auxiliary.md)",
-  "carpet.rule.subtickDefaultRange.desc": "Default range for queueStep"
+  "carpet.rule.subtickDefaultRange.desc": "Default range for queueStep",
+  "subtick.hovermessage.tips": "Click to copy the complete stack"
 }

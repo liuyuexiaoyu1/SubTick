@@ -7,15 +7,24 @@ import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import carpet.utils.Messenger;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.*;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.BlockEventData;
 
+import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.tuple.Triple;
 
 import subtick.network.ServerNetworkHandler;
 import subtick.queues.BlockEventQueue;
 import subtick.queues.TickingQueue;
 import subtick.util.Translations;
+import subtick.util.deobfuscator.StackTraceDeobfuscator;
+//#if MC > 11802
+//$$ import net.minecraft.network.chat.Component;
+//#endif
+
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public class Queues implements IQueues
 {
@@ -49,8 +58,7 @@ public class Queues implements IQueues
     Messenger.m(c, "w range: " + range);
   }
 
-  private void step(TickingQueue newQueue, CommandSourceStack c, int newCount, BlockPos newPos, int newRange) throws CommandSyntaxException
-  {
+  private void step(TickingQueue newQueue, CommandSourceStack c, int newCount, BlockPos newPos, int newRange) {
     queue = newQueue;
     actor = c;
     count = newCount;
@@ -65,25 +73,16 @@ public class Queues implements IQueues
     level = c.getLevel();
     newQueue.setMode(modeKey);
     TickPhase phase = new TickPhase(level, newQueue.getPhase());
-    if (force) {
-      if (tickHandler.canStep(0, phase) && !newQueue.exhausted) {
-        step(newQueue, c, count, pos, range);
-        tickHandler.step(c, 0, phase);
-        return;
-      }
-      if (tickHandler.frozen()) {
-        step(newQueue, c, count, pos, range);
-        tickHandler.step(c, 1, phase);
-        return;
-      }
-    } else {
-      if (tickHandler.canStep(c, 0, phase)) {
-        step(newQueue, c, count, pos, range);
-        tickHandler.step(c, 0, phase);
-        return;
-      }
+    if(force ? tickHandler.canStep(0, phase) && !newQueue.cantStep() : tickHandler.canStep(c, 0, phase))
+    {
+      step(newQueue, c, count, pos, range);
+      tickHandler.step(c, 0, phase);
     }
-    tickHandler.canStep(c, 0, phase);
+    else if(force && tickHandler.canStep(c, 1, phase))
+    {
+      step(newQueue, c, count, pos, range);
+      tickHandler.step(c, 1, phase);
+    }
   }
 
   @Override
@@ -112,11 +111,44 @@ public class Queues implements IQueues
     }
     catch(Exception e)
     {
-      Translations.m(actor, "queueCommand.err.crash", queue);
+      sendErr(e);
     }
 
     prev_queue = queue;
     scheduled = false;
+  }
+
+  private void sendErr(Exception e) {
+    String deobfuscatedStack = Arrays.stream(StackTraceDeobfuscator.deobfuscateStackTrace(e.getStackTrace()))
+            .map(StackTraceElement::toString)
+            .collect(Collectors.joining("\n"));
+    SubTick.LOGGER.error("Crashed while stepping {} {}", queue.getName(), deobfuscatedStack);
+    MutableComponent message = (MutableComponent) Messenger.c(Translations.tr("subtick.feedback.queueCommand.err.crash", queue, null)[0]);
+    message.withStyle(style -> style
+            .withHoverEvent(
+                    //#if MC >= 12105
+                    //$$ new HoverEvent.ShowText(
+                    //#else
+                    new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                    //#endif
+                    Messenger.c("w " +Translations.tr("subtick.hovermessage.tips") +
+                            "\n" +
+                            deobfuscatedStack)
+            ))
+            .withClickEvent(
+                    //#if MC >= 12105
+                    //$$ new ClickEvent.CopyToClipboard(
+                    //#else
+                    new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD,
+                            //#endif
+                            deobfuscatedStack
+                    )
+            ));
+    actor.sendSuccess(
+            //#if MC > 11904
+            //$$ () ->
+            //#endif
+            message, actor.getServer().getLevel(Level.OVERWORLD) != null);
   }
 
   @Override
@@ -129,9 +161,13 @@ public class Queues implements IQueues
     if(!stepping)
       return;
 
-    prev_queue.step(1, BlockPos.ZERO, -2);
-    prev_queue.end();
-    prev_queue.exhausted = false;
+    try {
+      prev_queue.step(1, BlockPos.ZERO, -2);
+      prev_queue.end();
+      prev_queue.exhausted = false;
+    } catch (Exception e) {
+      sendErr(e);
+    }
     tickHandler.advancePhase(level);
     // this clears block event highlights
     ServerNetworkHandler.sendTickStep(level, 0, tickHandler.targetPhase());

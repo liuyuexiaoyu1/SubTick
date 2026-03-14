@@ -2,12 +2,11 @@ package subtick.queues;
 
 import java.util.Iterator;
 
+import carpet.patches.EntityPlayerMPFake;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.animal.Animal;
-import net.minecraft.world.entity.animal.WaterAnimal;
-import net.minecraft.world.entity.npc.Npc;
+import net.minecraft.world.entity.player.Player;
 import org.apache.commons.lang3.tuple.Triple;
 
 import subtick.QueueElement;
@@ -30,11 +29,16 @@ public class EntityQueue extends TickingQueue
   {
     this.level = level;
     queue.clear();
-    for(Entity e : level.entityTickList.active.values())
-      queue.add(new QueueElement(e));
+    for(Entity e : level.entityTickList.active.values()) {
+      if (!(e instanceof Player) || e instanceof EntityPlayerMPFake) {
+        queue.add(new QueueElement(e));
+      }
+    }
 
     level.entityTickList.iterated = level.entityTickList.active;
-    entity_iterator = level.entityTickList.active.values().iterator();
+    entity_iterator = level.entityTickList.active.values().stream()
+            .filter(e -> !(e instanceof Player) || e instanceof EntityPlayerMPFake)
+            .iterator();
   }
 
   @Override

@@ -15,6 +15,9 @@ repositories {
   maven {
     url 'https://www.cursemaven.com'
   }
+  maven {url = 'https://maven.fallenbreath.me/releases'
+    content {includeGroupAndSubgroups("me.fallenbreath")}
+  }
   maven {
     url 'https://maven.g4mesoft.com/releases'
   }
@@ -71,6 +74,12 @@ dependencies {
   }
   autoImplementation "com.terraformersmc:modmenu:${project.mod_menu_version}"
   autoImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+  if (!unobfuscated) {
+    include(autoImplementation("net.fabricmc:tiny-mappings-parser:0.3.0+build.17"))
+  }
+  include(autoImplementation("me.fallenbreath:conditional-mixin-fabric:0.6.4")) {
+    transitive = false
+  }
 }
 
 JavaVersion JAVA_COMPATIBILITY

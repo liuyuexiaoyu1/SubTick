@@ -27,6 +27,7 @@ import org.apache.logging.log4j.Logger;
 //$$ import net.minecraft.commands.CommandBuildContext;
 //#endif
 import com.mojang.brigadier.CommandDispatcher;
+import subtick.util.deobfuscator.StackTraceDeobfuscator;
 
 public class SubTick implements CarpetExtension, ModInitializer
 {
@@ -43,6 +44,7 @@ public class SubTick implements CarpetExtension, ModInitializer
   @Override
   public void onInitialize()
   {
+    StackTraceDeobfuscator.fetchMapping();
     CarpetServer.manageExtension(new SubTick());
     //#if MC >= 12005
     //$$ PacketRegister.s2c();

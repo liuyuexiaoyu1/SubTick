@@ -58,6 +58,7 @@ public class TickCommand
         // )
         // .executes((c) -> toggleFreeze(c.getSource(), TickPhase.byCommandKey(Settings.subtickDefaultPhase)))
       )
+              //#if MC < 12003
       .then(literal("step")
         .then(argument("ticks", integer(0))
           .then(argument("phase", word())
@@ -68,6 +69,7 @@ public class TickCommand
         )
         // .executes((c) -> step(c.getSource(), 1, TickPhase.byCommandKey(Settings.subtickDefaultPhase)))
       )
+              //#endif
     );
   }
 }

@@ -30,11 +30,13 @@ public class BlockEntityQueue extends TickingQueue
       level.pendingBlockEntityTickers.clear();
     }
     try {
+      level.blockEntityTickers.removeIf(be -> be.getType().endsWith("<lithium_sleeping>"));
       block_entity_iterator = level.blockEntityTickers.iterator();
 
       queue.clear();
-      for (TickingBlockEntity be : level.blockEntityTickers)
+      for (TickingBlockEntity be : level.blockEntityTickers) {
         queue.add(new QueueElement(be));
+      }
     } catch (Exception ignored) {}
   }
 
