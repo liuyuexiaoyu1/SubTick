@@ -1,33 +1,41 @@
 package subtick.mixins.client;
 
-import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.OutlineBufferSource;
-import net.minecraft.client.renderer.block.ModelBlockRenderer;
+import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.block.BlockRenderDispatcher;
+import net.minecraft.client.renderer.block.MovingBlockRenderState;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
+import net.minecraft.client.renderer.feature.BlockFeatureRenderer;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import subtick.client.Configs;
 import subtick.client.LevelRenderer;
 
 import java.util.List;
 
-@Mixin(ModelBlockRenderer.class)
+@Mixin(value = BlockFeatureRenderer.class, priority = 2000)
 public class BlockFeatureRendererMixin {
-    @WrapMethod(method = "tesselateBlock")
-    private void render(BlockAndTintGetter blockAndTintGetter, List<BlockModelPart> list, BlockState blockState, BlockPos blockPos, PoseStack poseStack, VertexConsumer vertexConsumer, boolean bl, int i, Operation<Void> original
+    @Inject(method = "render", at = @At("HEAD"))
+    private void render(SubmitNodeCollection submitNodeCollection, MultiBufferSource.BufferSource bufferSource, BlockRenderDispatcher blockRenderDispatcher, OutlineBufferSource outlineBufferSource, CallbackInfo ci
     ) {
-        if (LevelRenderer.hlBe.containsKey(blockPos)) {
-            OutlineBufferSource outlineBufferSource = Minecraft.getInstance().renderBuffers().outlineBufferSource();
-            outlineBufferSource.setColor(LevelRenderer.hlBe.get(blockPos));
-            original.call(blockAndTintGetter, list, blockState, blockPos, poseStack, vertexConsumer, bl, i);
-            outlineBufferSource.setColor(-1);
-        }else {
-            original.call(blockAndTintGetter, list, blockState, blockPos, poseStack, vertexConsumer, bl, i);
+        for(SubmitNodeStorage.MovingBlockSubmit movingBlockSubmit : submitNodeCollection.getMovingBlockSubmits()) {
+            BlockPos pos = movingBlockSubmit.movingBlockRenderState().blockPos;
+            if (LevelRenderer.hlBe.containsKey(pos.immutable()) && Configs.EXPERIMENTAL_RENDERING.getBooleanValue()) {
+                outlineBufferSource.setColor(LevelRenderer.hlBe.get(pos));
+                MovingBlockRenderState movingBlockRenderState = movingBlockSubmit.movingBlockRenderState();
+                BlockState blockState = movingBlockRenderState.blockState;
+                List<BlockModelPart> list = blockRenderDispatcher.getBlockModel(blockState).collectParts(RandomSource.create(blockState.getSeed(movingBlockRenderState.randomSeedPos)));
+                PoseStack poseStack = new PoseStack();
+                poseStack.mulPose(movingBlockSubmit.pose());
+                blockRenderDispatcher.getModelRenderer().tesselateBlock(movingBlockRenderState, list, blockState, movingBlockRenderState.blockPos, poseStack, new LevelRenderer.InvisibleOutlineBufferSource().getBuffer(ItemBlockRenderTypes.getMovingBlockRenderType(blockState)), false, OverlayTexture.NO_OVERLAY);
+                outlineBufferSource.setColor(-1);
+            }
         }
     }
 }

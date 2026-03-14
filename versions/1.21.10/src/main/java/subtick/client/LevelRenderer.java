@@ -26,8 +26,10 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.piston.PistonMovingBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -54,17 +56,17 @@ public class LevelRenderer
             .build();
     public static final net.minecraft.client.renderer.RenderType WORLD_QUADS = net.minecraft.client.renderer.RenderType.create(
             "subtick_world_quads",
-    //#if MC >= 12111
-    //$$ net.minecraft.client.renderer.rendertype.RenderSetup.builder(WORLD_QUAD_PIPELINE)
-    //$$                .affectsCrumbling()
-    //$$                .sortOnUpload()
-    //$$                .bufferSize(256)
-    //$$                .createRenderSetup()
-    //#else
-    256, false, true, WORLD_QUAD_PIPELINE,
+            //#if MC >= 12111
+            //$$ net.minecraft.client.renderer.rendertype.RenderSetup.builder(WORLD_QUAD_PIPELINE)
+            //$$                .affectsCrumbling()
+            //$$                .sortOnUpload()
+            //$$                .bufferSize(256)
+            //$$                .createRenderSetup()
+            //#else
+            256, false, true, WORLD_QUAD_PIPELINE,
             net.minecraft.client.renderer.RenderType.CompositeState.builder()
-                     .createCompositeState(false)
-    //#endif
+                    .createCompositeState(false)
+            //#endif
     );
     private static final Minecraft mc = Minecraft.getInstance();
     private static final HashSet<Pos> hlPos = new HashSet<>();
@@ -76,20 +78,22 @@ public class LevelRenderer
         LevelRenderState levelRenderState = mc.gameRenderer.getLevelRenderState();
         SubmitNodeCollector output = mc.gameRenderer.getSubmitNodeStorage();
         Vec3 cpos = camera.position();
-        LevelRenderer.hlBe.clear();
         if (!renderText) {
-            Map<Integer, List<Outline>> groupedOutlines = hlPos.stream()
-                    .filter(p -> p instanceof Outline)
-                    .map(o -> (Outline) o)
-                    .collect(Collectors.groupingBy(o -> o.color().intValue));
+            LevelRenderer.hlBe.clear();
+            if (Configs.EXPERIMENTAL_RENDERING.getBooleanValue()) {
+                Map<Integer, List<Outline>> groupedOutlines = hlPos.stream()
+                        .filter(p -> p instanceof Outline)
+                        .map(o -> (Outline) o)
+                        .collect(Collectors.groupingBy(o -> o.color().intValue));
 
-            for (Map.Entry<Integer, List<Outline>> entry : groupedOutlines.entrySet()) {
-                int color = entry.getKey();
-                outlineBufferSource.setColor(color);
-                for (Outline o : entry.getValue()) {
-                    o.render(null, poseStack, camera, levelRenderState, output, outlineBufferSource, mc.level, true);
+                for (Map.Entry<Integer, List<Outline>> entry : groupedOutlines.entrySet()) {
+                    int color = entry.getKey();
+                    outlineBufferSource.setColor(color);
+                    for (Outline o : entry.getValue()) {
+                        o.render(null, poseStack, camera, levelRenderState, output, outlineBufferSource, mc.level, true);
+                    }
+                    outlineBufferSource.setColor(-1);
                 }
-                outlineBufferSource.setColor(-1);
             }
         } else {
             if (!hlPos.isEmpty() && !Configs.EXPERIMENTAL_RENDERING.getBooleanValue()) {
@@ -231,7 +235,11 @@ public class LevelRenderer
             poseStack.translate(pos.getX() - cpos.x, pos.getY() - cpos.y, pos.getZ() - cpos.z);
 
             if (blockEntity != null) {//See BlockEntityRendererMixin
-                hlBe.put(pos, color.intValue);
+                if (blockEntity instanceof PistonMovingBlockEntity movingBlock && movingBlock.isExtending()) {
+                    hlBe.put(pos.relative(movingBlock.getDirection().getOpposite()), color.intValue);
+                } else {
+                    hlBe.put(pos.immutable(), color.intValue);
+                }
             }
             if (state.getRenderShape() != RenderShape.MODEL) {
                 poseStack.popPose();
@@ -254,6 +262,14 @@ public class LevelRenderer
     }
 
     @SuppressWarnings("all")
+    public static class InvisibleOutlineBufferSource implements MultiBufferSource {
+        @Override
+        public VertexConsumer getBuffer(RenderType renderType) {
+            OutlineBufferSource outlineBufferSource = Minecraft.getInstance().renderBuffers().outlineBufferSource();
+            VertexConsumer vertexConsumer = outlineBufferSource.getBuffer(RenderType.outline(TextureAtlas.LOCATION_BLOCKS));
+            return vertexConsumer;
+        }
+    }
     public static class OutlineCollectorWrapper implements SubmitNodeCollector {
         private final SubmitNodeCollector delegate;
         private final int outlineColor;

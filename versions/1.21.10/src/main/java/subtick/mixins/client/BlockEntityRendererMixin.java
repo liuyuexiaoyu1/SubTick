@@ -9,6 +9,7 @@ import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.core.BlockPos;
 import org.spongepowered.asm.mixin.Mixin;
+import subtick.client.Configs;
 import subtick.client.LevelRenderer;
 
 @Mixin(BlockEntityRenderDispatcher.class)
@@ -16,9 +17,9 @@ public class BlockEntityRendererMixin {//1.21.10+
     @WrapMethod(method = "submit")
     public <S extends BlockEntityRenderState> void submit(S blockEntityRenderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState, Operation<Void> original) {
         BlockPos blockPos = blockEntityRenderState.blockPos;
-        if(LevelRenderer.hlBe.containsKey(blockPos)){
+        if (LevelRenderer.hlBe.containsKey(blockPos) && Configs.EXPERIMENTAL_RENDERING.getBooleanValue()){
             original.call(blockEntityRenderState, poseStack, new LevelRenderer.OutlineCollectorWrapper(submitNodeCollector, LevelRenderer.hlBe.get(blockPos)), cameraRenderState);
-        }else {
+        } else {
             original.call(blockEntityRenderState, poseStack, submitNodeCollector, cameraRenderState);
         }
     }
