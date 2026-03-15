@@ -12,6 +12,7 @@ import java.util.Map;
 
 /**
  * Copy from Carpet-TIS-Addition
+ * 此文件以LGPL-3.0协议开源
  */
 
 public class TinyMappingV2Reader implements MappingReader {

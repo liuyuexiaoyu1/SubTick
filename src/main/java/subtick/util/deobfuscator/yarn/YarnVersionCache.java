@@ -2,6 +2,7 @@ package subtick.util.deobfuscator.yarn;
 
 /**
  * Copy from Carpet-TIS-Addition
+ * 此文件以LGPL-3.0协议开源
  */
 
 public class YarnVersionCache {

@@ -1,12 +1,11 @@
 package subtick.util.deobfuscator.yarn;
 
-
 import com.google.common.collect.Lists;
 import com.google.common.net.UrlEscapers;
 import com.google.gson.*;
-import net.fabricmc.loader.api.FabricLoader;
 import org.apache.logging.log4j.Logger;
 import subtick.SubTick;
+import subtick.util.EnvironmentUtils;
 import subtick.util.deobfuscator.StackTraceDeobfuscator;
 
 import java.io.*;
@@ -22,11 +21,12 @@ import java.util.List;
 
 /**
  * Copy from Carpet-TIS-Addition
+ * 此文件以LGPL-3.0协议开源
  */
 
 public class OnlineMappingProvider {
 	private static final Logger LOGGER = SubTick.LOGGER;
-	public static final String MINECRAFT_VERSION = FabricLoader.getInstance().getRawGameVersion();
+	public static final String MINECRAFT_VERSION = EnvironmentUtils.getMinecraftVersionId();
 	public static final String YARN_META_URL = "https://meta.fabricmc.net/v2/versions/yarn/" + MINECRAFT_VERSION;
 	public static final String YARN_MAPPING_URL_BASE = "https://maven.fabricmc.net/net/fabricmc/yarn/";
 	public static final String MAPPINGS_JAR_LOCATION = "mappings/mappings.tiny";
