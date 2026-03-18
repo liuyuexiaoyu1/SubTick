@@ -1,6 +1,11 @@
 package subtick.util;
 
+
+//#if MC >= 11802
+//$$ import net.minecraft.WorldVersion;
+//#else
 import com.mojang.bridge.game.GameVersion;
+//#endif
 import net.minecraft.SharedConstants;
 
 /**
@@ -9,7 +14,11 @@ import net.minecraft.SharedConstants;
  */
 
 public class EnvironmentUtils {
+    //#if MC >= 11802
+    //$$ public static WorldVersion getMinecraftVersion()
+    //#else
     public static GameVersion getMinecraftVersion()
+    //#endif
     {
         return SharedConstants.getCurrentVersion();
     }
