@@ -25,13 +25,21 @@ public class EnvironmentUtils {
 
     public static String getMinecraftVersionId()
     {
+        //#if MC >= 12108
+        //$$ return getMinecraftVersion().id();
+        //#else
         return getMinecraftVersion().getId();
+        //#endif
     }
 
     @SuppressWarnings("unused")
     public static String getMinecraftVersionName()
     {
+        //#if MC >= 12108
+        //$$ return getMinecraftVersion().name();
+        //#else
         return getMinecraftVersion().getName();
+        //#endif
     }
 
     @SuppressWarnings("unused")
