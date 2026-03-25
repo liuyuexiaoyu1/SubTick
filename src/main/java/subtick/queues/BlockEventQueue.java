@@ -79,7 +79,11 @@ public class BlockEventQueue extends TickingQueue
           mirrorSuccess = true;
         }
         //#if MC >= 11800
+        //#if MC >= 26.1
+        //$$ if(level.shouldTickBlocksAt(ChunkPos.pack(blockEvent.pos())))
+        //#else
         //$$ if(level.shouldTickBlocksAt(ChunkPos.asLong(blockEvent.pos())))
+        //#endif
         //$$ {
         //#endif
           if(!level.doBlockEvent(blockEvent))

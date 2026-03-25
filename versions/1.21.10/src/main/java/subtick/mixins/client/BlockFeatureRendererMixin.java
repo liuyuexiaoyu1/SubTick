@@ -1,16 +1,17 @@
 package subtick.mixins.client;
 
+import org.spongepowered.asm.mixin.Mixin;
+import net.minecraft.client.renderer.feature.BlockFeatureRenderer;
+//#if MC < 26.1
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.block.MovingBlockRenderState;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
-import net.minecraft.client.renderer.feature.BlockFeatureRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
-import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -18,9 +19,11 @@ import subtick.client.Configs;
 import subtick.client.LevelRenderer;
 
 import java.util.List;
+//#endif
 
 @Mixin(value = BlockFeatureRenderer.class, priority = 2000)
 public class BlockFeatureRendererMixin {
+    //#if MC < 26.1
     @Inject(method = "render", at = @At("HEAD"))
     private void render(SubmitNodeCollection submitNodeCollection, MultiBufferSource.BufferSource bufferSource, BlockRenderDispatcher blockRenderDispatcher, OutlineBufferSource outlineBufferSource, CallbackInfo ci
     ) {
@@ -38,4 +41,5 @@ public class BlockFeatureRendererMixin {
             }
         }
     }
+    //#endif
 }

@@ -19,6 +19,10 @@ repositories {
     content {includeGroupAndSubgroups("me.fallenbreath")}
   }
   maven {
+    url = 'https://maven.fallenbreath.me/jitpack'
+    content { includeGroupAndSubgroups('com.github') }
+  }
+  maven {
     url 'https://maven.g4mesoft.com/releases'
   }
   maven {
@@ -46,6 +50,7 @@ dependencies {
     return dep
   }
   def autoImplementation = { Object... args -> processDependency(unobfuscated ? implementation(*args) : modImplementation(*args)) }
+  def autoCompileOnly = { Object... args -> processDependency(unobfuscated ? compileOnly(*args) : modCompileOnly(*args)) }
   // loom
   minecraft "com.mojang:minecraft:${project.minecraft_version}"
   if (!unobfuscated) {
@@ -58,10 +63,10 @@ dependencies {
   autoImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
   // mods
   autoImplementation "carpet:fabric-carpet:${project.carpet_core_version}"
-  autoImplementation "com.g4mesoft:g4mespeed:${project.g4mespeed_version}"
+  autoCompileOnly "com.g4mesoft:g4mespeed:${project.g4mespeed_version}"
   include(autoImplementation(annotationProcessor("io.github.llamalad7:mixinextras-fabric:0.2.2")))
   if (mcVersion >= 12101) {
-    autoImplementation "${project.lithium_version}"
+    autoCompileOnly "${project.lithium_version}"
   } else {
     autoImplementation "maven.modrinth:lithium:${project.lithium_version}"
   }
@@ -83,7 +88,9 @@ dependencies {
 }
 
 JavaVersion JAVA_COMPATIBILITY
-if (mcVersion >= 12005) {
+if (mcVersion >= 26_00_00) {
+  JAVA_COMPATIBILITY = JavaVersion.VERSION_25
+} else if (mcVersion >= 12005) {
   JAVA_COMPATIBILITY = JavaVersion.VERSION_21
 } else if (mcVersion >= 11800) {
   JAVA_COMPATIBILITY = JavaVersion.VERSION_17
@@ -102,9 +109,6 @@ loom {
   accessWidenerPath = file("src/main/resources/subtick.accesswidener")
 }
 
-remapJar {
-  //remapperIsolation = true
-}
 
 String versionSuffix = ''
 if (System.getenv("BUILD_RELEASE") != "true") {

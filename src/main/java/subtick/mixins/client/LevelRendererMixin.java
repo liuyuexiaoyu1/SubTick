@@ -60,9 +60,16 @@ import carpet.fakes.MinecraftClientInferface;
 //$$ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 //#endif
 //#if MC >= 12109
+//#if MC >= 26.1
+//$$ import org.joml.Matrix4fc;
+//$$ import net.minecraft.client.renderer.chunk.ChunkSectionsToRender;
+//$$ import net.minecraft.client.renderer.state.level.LevelRenderState;
+//$$ import net.minecraft.client.renderer.state.level.CameraRenderState;
+//#else
 //$$ import net.minecraft.client.renderer.state.LevelRenderState;
-//$$ import net.minecraft.client.renderer.entity.state.EntityRenderState;
 //$$ import net.minecraft.client.renderer.state.CameraRenderState;
+//#endif
+//$$ import net.minecraft.client.renderer.entity.state.EntityRenderState;
 //$$ import org.joml.Vector4f;
 //#endif
 //#if MC >= 12108
@@ -84,12 +91,16 @@ public class LevelRendererMixin
   //$$ @Shadow @Final private LevelRenderState levelRenderState;
   //#endif
   @Inject(
-          //#if MC >= 12103
+          //#if MC >= 26.1
+          //$$ method = "lambda$addMainPass$0",
+          //#elseif MC >= 12103
           //$$ method = "method_62214",
           //#else
           method = "renderLevel",
           //#endif
-          //#if MC >= 12110
+          //#if MC >= 26.1
+          //$$ at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/LevelRenderer;submitBlockEntities(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/state/level/LevelRenderState;Lnet/minecraft/client/renderer/SubmitNodeStorage;)V")
+          //#elseif MC >= 12110
           //$$ at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/feature/FeatureRenderDispatcher;renderAllFeatures()V")
           //#elseif MC >= 12108
           //$$ at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/LevelRenderer;renderEntities(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/Camera;Lnet/minecraft/client/DeltaTracker;Ljava/util/List;)V")
@@ -98,7 +109,9 @@ public class LevelRendererMixin
           //#endif
   )
   private void onRenderWorldLastNormal(
-          //#if MC >= 12111
+          //#if MC >= 26.1
+          //$$ GpuBufferSlice terrainFog, LevelRenderState levelRenderState, ProfilerFiller profiler, ChunkSectionsToRender chunkSectionsToRender, ResourceHandle<?> entityOutlineTarget, ResourceHandle<?> translucentTarget, ResourceHandle<?> mainTarget, ResourceHandle<?> itemEntityTarget, ResourceHandle<?> particleTarget, boolean renderOutline, Matrix4fc modelViewMatrix, CallbackInfo ci, @Local(name = "poseStack") PoseStack poseStack
+          //#elseif MC >= 12111
           //$$ GpuBufferSlice gpuBufferSlice, LevelRenderState levelRenderState, ProfilerFiller profilerFiller, Matrix4f matrix4f, ResourceHandle<?> resourceHandle, ResourceHandle<?> resourceHandle2, boolean bl, ResourceHandle<?> resourceHandle3, ResourceHandle<?> resourceHandle4, CallbackInfo ci, @Local PoseStack poseStack
           //#elseif MC >= 12109
           //$$ GpuBufferSlice gpuBufferSlice, LevelRenderState levelRenderState, ProfilerFiller profilerFiller, Matrix4f matrix4f, ResourceHandle<?> resourceHandle, ResourceHandle<?> resourceHandle2, boolean bl, Frustum frustum, ResourceHandle<?> resourceHandle3, ResourceHandle<?> resourceHandle4, CallbackInfo ci, @Local PoseStack poseStack
@@ -121,7 +134,9 @@ public class LevelRendererMixin
     subtick.client.LevelRenderer.render(poseStack, outlineBufferSource, false);
   }
 
-  //#if MC >= 12111
+  //#if MC >= 26.1
+  //$$ @Inject(method = "lambda$addLateDebugPass$0", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/RenderBuffers;bufferSource()Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;"))
+  //#elseif MC >= 12111
   //$$ @Inject(method = "method_75413", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/RenderBuffers;bufferSource()Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;"))
   //#elseif MC >= 12109
   //$$ @Inject(method = "method_72915", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/RenderBuffers;bufferSource()Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;"))
@@ -131,7 +146,9 @@ public class LevelRendererMixin
   @Inject(method = "renderLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/LevelRenderer;renderSnowAndRain(Lnet/minecraft/client/renderer/LightTexture;FDDD)V", ordinal = 1))
   //#endif
   private void onRenderWorldLastSnow(
-          //#if MC >= 12111
+          //#if MC >= 26.1
+          //$$ GpuBufferSlice fog, ResourceHandle<?> mainTarget, CameraRenderState camera, Matrix4fc modelViewMatrix, CallbackInfo ci, @Local(name = "poseStack") PoseStack poseStack
+          //#elseif MC >= 12111
           //$$ GpuBufferSlice gpuBufferSlice, ResourceHandle<?> resourceHandle, CameraRenderState cameraRenderState, Matrix4f matrix4f, CallbackInfo ci, @Local PoseStack poseStack
           //#elseif MC >= 12109
           //$$ GpuBufferSlice gpuBufferSlice, Vec3 vec3, ResourceHandle<?> resourceHandle, Frustum frustum, CallbackInfo ci, @Local PoseStack poseStack

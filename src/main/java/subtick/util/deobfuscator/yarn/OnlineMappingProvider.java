@@ -3,6 +3,7 @@ package subtick.util.deobfuscator.yarn;
 import com.google.common.collect.Lists;
 import com.google.common.net.UrlEscapers;
 import com.google.gson.*;
+import com.mojang.datafixers.util.Pair;
 import org.apache.logging.log4j.Logger;
 import subtick.SubTick;
 import subtick.util.EnvironmentUtils;
@@ -17,6 +18,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -44,9 +46,19 @@ public class OnlineMappingProvider {
 	private static String getYarnVersionOnline() throws IOException {
 		URL url = URI.create(YARN_META_URL).toURL();
 		URLConnection request = url.openConnection();
-		JsonParser parser = new JsonParser();
-		JsonElement json = parser.parse(new InputStreamReader(request.getInputStream()));
-		return json.getAsJsonArray().get(0).getAsJsonObject().get("version").getAsString();
+		List<Pair<Integer, String>> list = Lists.newArrayList();
+		JsonElement json =
+				//#if MC >= 11800
+				//$$ JsonParser.parseReader
+				//#else
+				(new JsonParser()).parse
+						//#endif
+								(new InputStreamReader(request.getInputStream()));
+		json.getAsJsonArray().forEach(e -> {
+			JsonObject object = e.getAsJsonObject();
+			list.add(Pair.of(object.get("build").getAsInt(), object.get("version").getAsString()));
+		});
+		return list.stream().max(Comparator.comparingInt(Pair::getFirst)).orElseThrow(() -> new IOException("Empty list")).getSecond();
 	}
 
 	synchronized private static String getYarnVersion(boolean useCache) throws IOException {

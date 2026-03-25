@@ -8,22 +8,22 @@ plugins {
 
 preprocess {
   strictExtraMappings = false
-  // def mc1165 = createNode('1.16.5', 1_16_05, 'yarn')
-  def mc11701 = createNode('1.17.1', 1_17_01, 'yarn')
-  def mc11802 = createNode('1.18.2', 1_18_02, 'yarn')
-  def mc11903 = createNode('1.19.3', 1_19_03, 'yarn')
-  def mc11904 = createNode('1.19.4', 1_19_04, 'yarn')
-  def mc12001 = createNode('1.20.1', 1_20_01, 'yarn')
-  def mc12004 = createNode('1.20.4', 1_20_04, 'yarn')
-  def mc12006 = createNode('1.20.6', 1_20_06, 'yarn')
-  def mc12101 = createNode('1.21.1', 1_21_01, 'yarn')
-  def mc12103 = createNode('1.21.3', 1_21_03, 'yarn')
-  def mc12104 = createNode('1.21.4', 1_21_04, 'yarn')
-  def mc12105 = createNode('1.21.5', 1_21_05, 'yarn')
-  def mc12108 = createNode('1.21.8', 1_21_08, 'yarn')
-  def mc12110 = createNode('1.21.10', 1_21_10, 'yarn')
-  def mc12111 = createNode('1.21.11', 1_21_11, 'yarn')
-//  def mc260100 = createNode('26.1', 26_01_00, 'yarn')
+  // def mc1165 = createNode('1.16.5', 1_16_05, '')
+  def mc11701 = createNode('1.17.1', 1_17_01, '')
+  def mc11802 = createNode('1.18.2', 1_18_02, '')
+  def mc11903 = createNode('1.19.3', 1_19_03, '')
+  def mc11904 = createNode('1.19.4', 1_19_04, '')
+  def mc12001 = createNode('1.20.1', 1_20_01, '')
+  def mc12004 = createNode('1.20.4', 1_20_04, '')
+  def mc12006 = createNode('1.20.6', 1_20_06, '')
+  def mc12101 = createNode('1.21.1', 1_21_01, '')
+  def mc12103 = createNode('1.21.3', 1_21_03, '')
+  def mc12104 = createNode('1.21.4', 1_21_04, '')
+  def mc12105 = createNode('1.21.5', 1_21_05, '')
+  def mc12108 = createNode('1.21.8', 1_21_08, '')
+  def mc12110 = createNode('1.21.10', 1_21_10, '')
+  def mc12111 = createNode('1.21.11', 1_21_11, '')
+  def mc260100 = createNode('26.1', 26_01_00, '')
 
   // mc1165.link(mc1171, file('versions/mapping-1.16-1.17.txt'))
   mc11701.link(mc11802, null)
@@ -39,7 +39,7 @@ preprocess {
   mc12105.link(mc12108, null)
   mc12108.link(mc12110, null)
   mc12110.link(mc12111, null)
-//  mc12111.link(mc260100, null)
+  mc12111.link(mc260100, null)
 
   for (final def node in getNodes()) {
     findProject(node.project).ext.mcVersion = node.mcVersion

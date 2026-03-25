@@ -11,7 +11,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 //$$ import net.minecraft.client.DeltaTracker;
 //#endif
 import net.minecraft.client.gui.Gui;
-//#if MC >= 12000
+//#if MC >= 26.1
+//$$ import net.minecraft.client.gui.GuiGraphicsExtractor;
+//#elseif MC >= 12000
 //$$ import net.minecraft.client.gui.GuiGraphics;
 //#endif
 import subtick.client.HudRenderer;
@@ -20,8 +22,14 @@ import subtick.client.HudRenderer;
 public class GuiMixin
 {
   //#if MC >= 12000
+  //#if MC >= 26.1
+  //$$ @Inject(method = "extractRenderState", at = @At("RETURN"))
+  //#else
   //$$ @Inject(method = "render", at = @At("RETURN"))
-  //#if MC >= 12101
+  //#endif
+  //#if MC >= 26.1
+  //$$ private void renderHud(GuiGraphicsExtractor guiGraphics,DeltaTracker deltaTracker, CallbackInfo ci)
+  //#elseif MC >= 12101
   //$$ private void renderHud(GuiGraphics guiGraphics,DeltaTracker deltaTracker, CallbackInfo ci)
   //#else
   //$$ private void renderHud(GuiGraphics guiGraphics, float partialTick, CallbackInfo ci)

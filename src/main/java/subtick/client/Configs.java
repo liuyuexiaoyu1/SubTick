@@ -86,7 +86,11 @@ public class Configs implements IConfigHandler
 
     JsonObject root = new JsonObject();
     ConfigUtils.writeConfigBase(root, "Config", OPTIONS);
+    //#if MC >= 26.1
+    //$$ JsonUtils.writeJsonToFile(root, new File(dir, "subtick.json").toPath());
+    //#else
     JsonUtils.writeJsonToFile(root, new File(dir, "subtick.json"));
+    //#endif
   }
 
   @Override
@@ -102,7 +106,11 @@ public class Configs implements IConfigHandler
     if(!configFile.exists() || !configFile.isFile() || !configFile.canRead())
       return;
 
+    //#if MC >= 26.1
+    //$$ JsonElement element = JsonUtils.parseJsonFile(configFile.toPath());
+    //#else
     JsonElement element = JsonUtils.parseJsonFile(configFile);
+    //#endif
     if(element == null || !element.isJsonObject())
       return;
 
