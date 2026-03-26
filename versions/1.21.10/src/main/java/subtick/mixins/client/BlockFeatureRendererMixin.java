@@ -2,7 +2,6 @@ package subtick.mixins.client;
 
 import org.spongepowered.asm.mixin.Mixin;
 import net.minecraft.client.renderer.feature.BlockFeatureRenderer;
-//#if MC < 26.1
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
@@ -19,11 +18,9 @@ import subtick.client.Configs;
 import subtick.client.LevelRenderer;
 
 import java.util.List;
-//#endif
 
 @Mixin(value = BlockFeatureRenderer.class, priority = 2000)
 public class BlockFeatureRendererMixin {
-    //#if MC < 26.1
     @Inject(method = "render", at = @At("HEAD"))
     private void render(SubmitNodeCollection submitNodeCollection, MultiBufferSource.BufferSource bufferSource, BlockRenderDispatcher blockRenderDispatcher, OutlineBufferSource outlineBufferSource, CallbackInfo ci
     ) {
@@ -41,5 +38,4 @@ public class BlockFeatureRendererMixin {
             }
         }
     }
-    //#endif
 }

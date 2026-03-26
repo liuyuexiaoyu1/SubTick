@@ -32,7 +32,11 @@ public class ClientLevelMixin
   }
   //#endif
 
-  @com.llamalad7.mixinextras.injector.v2.WrapWithCondition(method = "method_32124", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientLevel;guardEntityTick(Ljava/util/function/Consumer;Lnet/minecraft/world/entity/Entity;)V"))
+  //#if MC >= 26.1
+  //$$ @WrapWithCondition(method = "lambda$tickEntities$0", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientLevel;guardEntityTick(Ljava/util/function/Consumer;Lnet/minecraft/world/entity/Entity;)V"))
+  //#else
+  @WrapWithCondition(method = "method_32124", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientLevel;guardEntityTick(Ljava/util/function/Consumer;Lnet/minecraft/world/entity/Entity;)V"))
+  //#endif
   private boolean tickNonPassenger(ClientLevel instance, Consumer<?> consumer, Entity entity)
   {
     return ClientTickHandler.shouldTick() || canTick(entity);
