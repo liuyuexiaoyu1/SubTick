@@ -30,6 +30,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import subtick.client.Configs;
 import subtick.client.LevelRenderer;
 
+import java.lang.ScopedValue;
+
 @Mixin(value = BlockFeatureRenderer.class, priority = 2000)
 public class BlockFeatureRendererMixin {
     @Unique private final ScopedValue<OutlineBufferSource> outlineBufferSource = ScopedValue.newInstance();
