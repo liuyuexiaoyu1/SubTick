@@ -14,6 +14,7 @@
     "carpet.TickCommandMixin",
     "client.BlockEntityRendererMixin",
     "client.BlockFeatureRendererMixin",
+    "client.HudMixin",
     "client.MinecraftMixin",
     "lithium.LithiumServerTickSchedulerAccessor"
   ],

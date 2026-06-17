@@ -14,7 +14,16 @@ import fi.dy.masa.malilib.config.options.ConfigColor;
 import fi.dy.masa.malilib.config.options.ConfigInteger;
 import fi.dy.masa.malilib.config.options.ConfigOptionList;
 import fi.dy.masa.malilib.util.FileUtils;
+//#if MC < 26.2
 import fi.dy.masa.malilib.util.JsonUtils;
+//#else
+//$$ import com.google.gson.Gson;
+//$$ import com.google.gson.GsonBuilder;
+//$$ import com.google.gson.JsonParser;
+//$$ import java.io.FileReader;
+//$$ import java.io.FileWriter;
+//$$ import java.io.IOException;
+//#endif
 import subtick.client.HudRenderer.Align;
 
 public class Configs implements IConfigHandler
@@ -86,7 +95,16 @@ public class Configs implements IConfigHandler
 
     JsonObject root = new JsonObject();
     ConfigUtils.writeConfigBase(root, "Config", OPTIONS);
-    //#if MC >= 26.1
+    //#if MC >= 26.2
+    //$$ try (FileWriter writer = new FileWriter(new File(dir, "subtick.json").toPath().toFile()))
+    //$$ {
+    //$$   new GsonBuilder().setPrettyPrinting().create().toJson(root, writer);
+    //$$ }
+    //$$ catch (IOException e)
+    //$$ {
+    //$$   e.printStackTrace();
+    //$$ }
+    //#elseif MC >= 26.1
     //$$ JsonUtils.writeJsonToFile(root, new File(dir, "subtick.json").toPath());
     //#else
     JsonUtils.writeJsonToFile(root, new File(dir, "subtick.json"));
@@ -106,7 +124,17 @@ public class Configs implements IConfigHandler
     if(!configFile.exists() || !configFile.isFile() || !configFile.canRead())
       return;
 
-    //#if MC >= 26.1
+    //#if MC >= 26.2
+    //$$ JsonElement element = null;
+    //$$ try (FileReader reader = new FileReader(configFile.toPath().toFile()))
+    //$$ {
+    //$$   element = JsonParser.parseReader(reader);
+    //$$ }
+    //$$ catch (IOException e)
+    //$$ {
+    //$$   e.printStackTrace();
+    //$$ }
+    //#elseif MC >= 26.1
     //$$ JsonElement element = JsonUtils.parseJsonFile(configFile.toPath());
     //#else
     JsonElement element = JsonUtils.parseJsonFile(configFile);

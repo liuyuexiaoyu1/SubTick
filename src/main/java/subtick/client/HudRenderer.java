@@ -3,6 +3,7 @@ package subtick.client;
 import java.util.List;
 import java.util.Map;
 
+import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.Options;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -95,7 +96,7 @@ public class HudRenderer
     @Override
     public String getDisplayName()
     {
-      return Translations.tr("subtick.client.align." + translationKey);
+      return StringUtils.translate("subtick.client.align." + translationKey);
     }
 
     @Override
