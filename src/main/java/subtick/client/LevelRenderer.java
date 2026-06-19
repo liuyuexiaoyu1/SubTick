@@ -25,6 +25,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -347,7 +348,7 @@ public class LevelRenderer
     public void render(BufferBuilder buffer, PoseStack poseStack, Quaternion rotation, double cx, double cy, double cz)
     //#endif
     {
-      BlockPos bpos = BlockPos.containing(x, y, z);
+      BlockPos bpos = new BlockPos(Mth.floor(x), Mth.floor(y), Mth.floor(z));
       Vec3 offset = hlPistonOffsets.get(bpos);
       double ox = offset != null ? offset.x : 0, oy = offset != null ? offset.y : 0, oz = offset != null ? offset.z : 0;
       poseStack.pushPose();
@@ -391,7 +392,7 @@ public class LevelRenderer
     public void render(BufferBuilder buffer, PoseStack poseStack, Quaternion rotation, double cx, double cy, double cz)
     //#endif
     {
-      BlockPos bpos = BlockPos.containing(x, y, z);
+      BlockPos bpos = new BlockPos(Mth.floor(x), Mth.floor(y), Mth.floor(z));
       Vec3 offset = hlPistonOffsets.get(bpos);
       double ox = offset != null ? offset.x : 0, oy = offset != null ? offset.y : 0, oz = offset != null ? offset.z : 0;
       poseStack.pushPose();
