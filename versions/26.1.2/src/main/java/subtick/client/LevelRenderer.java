@@ -163,12 +163,18 @@ public class LevelRenderer
         public void render(BufferBuilder buffer, PoseStack poseStack, Camera camera, SubmitNodeCollector output, OutlineBufferSource outlineBufferSource, Level level, boolean NEW)
         {
             if (!NEW) {
+                BlockEntity be = level.getBlockEntity(pos);
+                if (be instanceof PistonMovingBlockEntity movingBlock) {
+                    hlPistonOffsets.put(pos.immutable(), new Vec3(movingBlock.getXOff(1.0f), movingBlock.getYOff(1.0f), movingBlock.getZOff(1.0f)));
+                }
+                Vec3 po = hlPistonOffsets.get(pos);
+                double pox = po != null ? po.x : 0, poy = po != null ? po.y : 0, poz = po != null ? po.z : 0;
                 double cx = camera.position().x;
                 double cy = camera.position().y;
                 double cz = camera.position().z;
-                double x1 = pos.getX();
-                double y1 = pos.getY();
-                double z1 = pos.getZ();
+                double x1 = pos.getX() + pox;
+                double y1 = pos.getY() + poy;
+                double z1 = pos.getZ() + poz;
                 double x2 = x1 + 1;
                 double y2 = y1 + 1;
                 double z2 = z1 + 1;

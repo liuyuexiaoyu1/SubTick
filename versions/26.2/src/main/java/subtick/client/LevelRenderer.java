@@ -148,15 +148,23 @@ public class LevelRenderer
         public void render(PoseStack poseStack, Camera camera, SubmitNodeCollector output, Level level, boolean NEW)
         {
             if (!NEW) {
+                // Non-experimental: store piston offset for text positioning, render colored cube
+                BlockEntity be = level.getBlockEntity(pos);
+                if (be instanceof PistonMovingBlockEntity movingBlock) {
+                    hlPistonOffsets.put(pos.immutable(), new Vec3(movingBlock.getXOff(1.0f), movingBlock.getYOff(1.0f), movingBlock.getZOff(1.0f)));
+                }
+                Vec3 pistonOff = hlPistonOffsets.get(pos);
+                double pox = pistonOff != null ? pistonOff.x : 0;
+                double poy = pistonOff != null ? pistonOff.y : 0;
+                double poz = pistonOff != null ? pistonOff.z : 0;
                 if (output instanceof SubmitNodeStorage storage) {
                     SubmitNodeCollection collection = storage.order(0);
                     float r = color.r, g = color.g, b = color.b, a = color.a;
                     Vec3 cpos = camera.position();
-                    float x = (float)(pos.getX() - cpos.x), y = (float)(pos.getY() - cpos.y), z = (float)(pos.getZ() - cpos.z);
+                    float x = (float)(pos.getX() + pox - cpos.x), y = (float)(pos.getY() + poy - cpos.y), z = (float)(pos.getZ() + poz - cpos.z);
                     float X = x + 1, Y = y + 1, Z = z + 1;
                     var pose = poseStack.last().copy();
-                    RenderType rt = RenderTypes.debugQuads();
-                    var submit = new CustomFeatureRenderer.Submit(pose, rt, (p, buffer) -> {
+                    var submit = new CustomFeatureRenderer.Submit(pose, RenderTypes.debugQuads(), (p, buffer) -> {
                         buffer.addVertex(x, y, z).setColor(r, g, b, a).setNormal(0, 0, -1).setLineWidth(1);
                         buffer.addVertex(x, Y, z).setColor(r, g, b, a).setNormal(0, 0, -1).setLineWidth(1);
                         buffer.addVertex(x, Y, Z).setColor(r, g, b, a).setNormal(0, 0, -1).setLineWidth(1);
