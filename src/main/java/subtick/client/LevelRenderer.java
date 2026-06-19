@@ -1,5 +1,6 @@
 package subtick.client;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.piston.PistonMovingBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -41,9 +43,11 @@ public class LevelRenderer
   private static final Font font = mc.font;
   private static final HashSet<Pos> hlPos = new HashSet<>();
   private static final HashSet<Text> texts = new HashSet<>();
+  private static final HashMap<BlockPos,Vec3> hlPistonOffsets = new HashMap<>();
 
   public static synchronized void render(PoseStack poseStack, OutlineBufferSource outlineBufferSource, boolean renderText)
   {
+    hlPistonOffsets.clear();
     RenderSystem.setShader(GameRenderer::getPositionColorShader);
     RenderSystem.enableBlend();
     RenderSystem.defaultBlendFunc();
@@ -200,6 +204,9 @@ public class LevelRenderer
       poseStack.translate(pos.getX() - cpos.x, pos.getY() - cpos.y, pos.getZ() - cpos.z);
 
       if (blockEntity != null) {
+        if (blockEntity instanceof PistonMovingBlockEntity movingBlock) {
+          hlPistonOffsets.put(pos.immutable(), new Vec3(movingBlock.getXOff(1.0f), movingBlock.getYOff(1.0f), movingBlock.getZOff(1.0f)));
+        }
         BlockEntityRenderDispatcher blockEntityRenderDispatcher = mc.getBlockEntityRenderDispatcher();
         blockEntityRenderDispatcher.render(blockEntity, 1.0f, poseStack, new InvisibleOutlineBufferSource(outlineBufferSource));
       }
@@ -340,8 +347,11 @@ public class LevelRenderer
     public void render(BufferBuilder buffer, PoseStack poseStack, Quaternion rotation, double cx, double cy, double cz)
     //#endif
     {
+      BlockPos bpos = BlockPos.containing(x, y, z);
+      Vec3 offset = hlPistonOffsets.get(bpos);
+      double ox = offset != null ? offset.x : 0, oy = offset != null ? offset.y : 0, oz = offset != null ? offset.z : 0;
       poseStack.pushPose();
-      poseStack.translate((float)(x - cx), (float)(y - cy), (float)(z - cz));
+      poseStack.translate((float)(x + ox - cx), (float)(y + oy - cy), (float)(z + oz - cz));
       poseStack.mulPose(rotation);
       poseStack.scale(-0.07F, -0.07F, 0.07F);
       RenderSystem.applyModelViewMatrix();
@@ -381,8 +391,11 @@ public class LevelRenderer
     public void render(BufferBuilder buffer, PoseStack poseStack, Quaternion rotation, double cx, double cy, double cz)
     //#endif
     {
+      BlockPos bpos = BlockPos.containing(x, y, z);
+      Vec3 offset = hlPistonOffsets.get(bpos);
+      double ox = offset != null ? offset.x : 0, oy = offset != null ? offset.y : 0, oz = offset != null ? offset.z : 0;
       poseStack.pushPose();
-      poseStack.translate((float)(x - cx), (float)(y - cy), (float)(z - cz));
+      poseStack.translate((float)(x + ox - cx), (float)(y + oy - cy), (float)(z + oz - cz));
       poseStack.mulPose(rotation);
       poseStack.scale(-0.07F, -0.07F, 0.08F);
       RenderSystem.applyModelViewMatrix();

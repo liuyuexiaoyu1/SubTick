@@ -7,6 +7,7 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.model.Model;
+import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.OrderedSubmitNodeCollector;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.SubmitNodeCollection;
@@ -53,12 +54,14 @@ public class LevelRenderer
     private static final HashSet<Pos> hlPos = new HashSet<>();
     private static final HashSet<Text> texts = new HashSet<>();
     public static final HashMap<BlockPos,Integer> hlBe = new HashMap<>();
+    private static final HashMap<BlockPos,Vec3> hlPistonOffsets = new HashMap<>();
 
     public static synchronized void render(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, boolean renderText) {
         Camera camera = mc.gameRenderer.mainCamera();
         Vec3 cpos = camera.position();
         if (!renderText) {
             LevelRenderer.hlBe.clear();
+            hlPistonOffsets.clear();
             if (Configs.EXPERIMENTAL_RENDERING.getBooleanValue()) {
                 Map<Integer, List<Outline>> groupedOutlines = hlPos.stream()
                         .filter(p -> p instanceof Outline)
@@ -145,51 +148,35 @@ public class LevelRenderer
         public void render(PoseStack poseStack, Camera camera, SubmitNodeCollector output, Level level, boolean NEW)
         {
             if (!NEW) {
-                // Non-experimental: draw colored cube faces via submitCustomGeometry.
-                // This routes to the outline phase when using an outline RenderType.
-                // The outline pipeline requires UV2 (light), Normal, and LineWidth vertex elements,
-                // so we set them explicitly for each vertex.
-                // Submit directly to alwaysOnTop phase for see-through rendering (no depth testing).
-                // Use SubmitNodeStorage to access the ordered collection's alwaysOnTop phase directly.
                 if (output instanceof SubmitNodeStorage storage) {
                     SubmitNodeCollection collection = storage.order(0);
                     float r = color.r, g = color.g, b = color.b, a = color.a;
-                    double cx = camera.position().x;
-                    double cy = camera.position().y;
-                    double cz = camera.position().z;
-                    float x = (float)(pos.getX() - cx), y = (float)(pos.getY() - cy), z = (float)(pos.getZ() - cz);
+                    Vec3 cpos = camera.position();
+                    float x = (float)(pos.getX() - cpos.x), y = (float)(pos.getY() - cpos.y), z = (float)(pos.getZ() - cpos.z);
                     float X = x + 1, Y = y + 1, Z = z + 1;
-                    // Build quads with a "no-depth" setup: use alwaysOnTop phase with debugQuads pipeline
                     var pose = poseStack.last().copy();
                     RenderType rt = RenderTypes.debugQuads();
-                    // Submit custom geometry via the CustomFeatureRenderer directly to alwaysOnTop
                     var submit = new CustomFeatureRenderer.Submit(pose, rt, (p, buffer) -> {
-                        // Neg Z
                         buffer.addVertex(x, y, z).setColor(r, g, b, a).setNormal(0, 0, -1).setLineWidth(1);
                         buffer.addVertex(x, Y, z).setColor(r, g, b, a).setNormal(0, 0, -1).setLineWidth(1);
                         buffer.addVertex(x, Y, Z).setColor(r, g, b, a).setNormal(0, 0, -1).setLineWidth(1);
                         buffer.addVertex(x, y, Z).setColor(r, g, b, a).setNormal(0, 0, -1).setLineWidth(1);
-                        // Pos Z
                         buffer.addVertex(X, y, z).setColor(r, g, b, a).setNormal(0, 0, 1).setLineWidth(1);
                         buffer.addVertex(X, y, Z).setColor(r, g, b, a).setNormal(0, 0, 1).setLineWidth(1);
                         buffer.addVertex(X, Y, Z).setColor(r, g, b, a).setNormal(0, 0, 1).setLineWidth(1);
                         buffer.addVertex(X, Y, z).setColor(r, g, b, a).setNormal(0, 0, 1).setLineWidth(1);
-                        // Neg X
                         buffer.addVertex(x, y, z).setColor(r, g, b, a).setNormal(-1, 0, 0).setLineWidth(1);
                         buffer.addVertex(x, y, Z).setColor(r, g, b, a).setNormal(-1, 0, 0).setLineWidth(1);
                         buffer.addVertex(X, y, Z).setColor(r, g, b, a).setNormal(-1, 0, 0).setLineWidth(1);
                         buffer.addVertex(X, y, z).setColor(r, g, b, a).setNormal(-1, 0, 0).setLineWidth(1);
-                        // Pos X
                         buffer.addVertex(x, Y, z).setColor(r, g, b, a).setNormal(1, 0, 0).setLineWidth(1);
                         buffer.addVertex(X, Y, z).setColor(r, g, b, a).setNormal(1, 0, 0).setLineWidth(1);
                         buffer.addVertex(X, Y, Z).setColor(r, g, b, a).setNormal(1, 0, 0).setLineWidth(1);
                         buffer.addVertex(x, Y, Z).setColor(r, g, b, a).setNormal(1, 0, 0).setLineWidth(1);
-                        // Neg Y
                         buffer.addVertex(x, y, z).setColor(r, g, b, a).setNormal(0, -1, 0).setLineWidth(1);
                         buffer.addVertex(X, y, z).setColor(r, g, b, a).setNormal(0, -1, 0).setLineWidth(1);
                         buffer.addVertex(X, Y, z).setColor(r, g, b, a).setNormal(0, -1, 0).setLineWidth(1);
                         buffer.addVertex(x, Y, z).setColor(r, g, b, a).setNormal(0, -1, 0).setLineWidth(1);
-                        // Pos Y
                         buffer.addVertex(x, y, Z).setColor(r, g, b, a).setNormal(0, 1, 0).setLineWidth(1);
                         buffer.addVertex(x, Y, Z).setColor(r, g, b, a).setNormal(0, 1, 0).setLineWidth(1);
                         buffer.addVertex(X, Y, Z).setColor(r, g, b, a).setNormal(0, 1, 0).setLineWidth(1);
@@ -201,12 +188,19 @@ public class LevelRenderer
                 poseStack.pushPose();
                 Vec3 cpos = camera.position();
                 poseStack.translate(pos.getX() - cpos.x, pos.getY() - cpos.y, pos.getZ() - cpos.z);
-                // Experimental: render the actual block model with outline color via submitBlockModel.
                 BlockState state = level.getBlockState(pos);
                 BlockEntity blockEntity = level.getBlockEntity(pos);
-                if (blockEntity != null) {//See BlockEntityRendererMixin
-                    if (blockEntity instanceof PistonMovingBlockEntity movingBlock && movingBlock.isExtending()) {
-                        hlBe.put(pos.relative(movingBlock.getDirection().getOpposite()), color.intValue);
+                if (blockEntity != null) {
+                    if (blockEntity instanceof PistonMovingBlockEntity movingBlock) {
+                        float ox = movingBlock.getXOff(1.0f);
+                        float oy = movingBlock.getYOff(1.0f);
+                        float oz = movingBlock.getZOff(1.0f);
+                        hlPistonOffsets.put(pos.immutable(), new Vec3(ox, oy, oz));
+                        if (movingBlock.isExtending()) {
+                            hlBe.put(pos.relative(movingBlock.getDirection().getOpposite()), color.intValue);
+                        } else {
+                            hlBe.put(pos.immutable(), color.intValue);
+                        }
                     } else {
                         hlBe.put(pos.immutable(), color.intValue);
                     }
@@ -303,7 +297,7 @@ public class LevelRenderer
         }
 
         @Override
-        public void submitCustomGeometry(PoseStack poseStack, RenderType renderType, CustomGeometryRenderer customGeometryRenderer) {
+        public void submitCustomGeometry(PoseStack poseStack, RenderType renderType, SubmitNodeCollector.CustomGeometryRenderer customGeometryRenderer) {
             delegate.submitCustomGeometry(poseStack, renderType, customGeometryRenderer);
         }
 
@@ -348,8 +342,13 @@ public class LevelRenderer
         {
             Font font = Minecraft.getInstance().font;
             FormattedCharSequence seq = getSequence();
+            BlockPos pos = BlockPos.containing(x, y, z);
+            Vec3 offset = hlPistonOffsets.get(pos);
+            double offX = offset != null ? offset.x : 0;
+            double offY = offset != null ? offset.y : 0;
+            double offZ = offset != null ? offset.z : 0;
             poseStack.pushPose();
-            poseStack.translate((float)(x - cx), (float)(y - cy), (float)(z - cz));
+            poseStack.translate((float)(x + offX - cx), (float)(y + offY - cy), (float)(z + offZ - cz));
             poseStack.mulPose(rotation);
             poseStack.scale(0.07F, -0.07F, 0.07F);
             collector.submitText(poseStack, -font.width(seq)/2F, -font.lineHeight * 0.5F, seq, false, Font.DisplayMode.SEE_THROUGH, 0xF000F0, color.intValue, 0x00000000, 0x00000000);
@@ -382,9 +381,14 @@ public class LevelRenderer
             Font font = Minecraft.getInstance().font;
             FormattedCharSequence seqIndex = FormattedCharSequence.forward(index, Style.EMPTY);
             FormattedCharSequence seqDepth = FormattedCharSequence.forward(depth, Style.EMPTY);
+            BlockPos pos = BlockPos.containing(x, y, z);
+            Vec3 offset = hlPistonOffsets.get(pos);
+            double offX = offset != null ? offset.x : 0;
+            double offY = offset != null ? offset.y : 0;
+            double offZ = offset != null ? offset.z : 0;
 
             poseStack.pushPose();
-            poseStack.translate((float)(x - cx), (float)(y - cy), (float)(z - cz));
+            poseStack.translate((float)(x + offX - cx), (float)(y + offY - cy), (float)(z + offZ - cz));
             poseStack.mulPose(rotation);
             poseStack.scale(0.07F, -0.07F, 0.08F);
             collector.submitText(poseStack, -font.width(seqIndex)/2F, -font.lineHeight * 0.5F, seqIndex, false, Font.DisplayMode.SEE_THROUGH, 0xF000F0, color1, 0x00000000, 0x00000000);

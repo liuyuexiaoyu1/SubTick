@@ -60,6 +60,7 @@ public class LevelRenderer
     private static final HashSet<Pos> hlPos = new HashSet<>();
     private static final HashSet<Text> texts = new HashSet<>();
     public static final HashMap<BlockPos,Integer> hlBe = new HashMap<>();
+    private static final HashMap<BlockPos,Vec3> hlPistonOffsets = new HashMap<>();
 
     public static synchronized void render(PoseStack poseStack, OutlineBufferSource outlineBufferSource, boolean renderText) {
         Camera camera = mc.gameRenderer.getMainCamera();
@@ -67,6 +68,7 @@ public class LevelRenderer
         Vec3 cpos = camera.position();
         if (!renderText) {
             LevelRenderer.hlBe.clear();
+            hlPistonOffsets.clear();
             if (Configs.EXPERIMENTAL_RENDERING.getBooleanValue()) {
                 Map<Integer, List<Outline>> groupedOutlines = hlPos.stream()
                         .filter(p -> p instanceof Outline)
@@ -210,9 +212,14 @@ public class LevelRenderer
             Vec3 cpos = camera.position();
             poseStack.translate(pos.getX() - cpos.x, pos.getY() - cpos.y, pos.getZ() - cpos.z);
 
-            if (blockEntity != null) {//See BlockEntityRendererMixin
-                if (blockEntity instanceof PistonMovingBlockEntity movingBlock && movingBlock.isExtending()) {
-                    hlBe.put(pos.relative(movingBlock.getDirection().getOpposite()), color.intValue);
+            if (blockEntity != null) {
+                if (blockEntity instanceof PistonMovingBlockEntity movingBlock) {
+                    hlPistonOffsets.put(pos.immutable(), new Vec3(movingBlock.getXOff(1.0f), movingBlock.getYOff(1.0f), movingBlock.getZOff(1.0f)));
+                    if (movingBlock.isExtending()) {
+                        hlBe.put(pos.relative(movingBlock.getDirection().getOpposite()), color.intValue);
+                    } else {
+                        hlBe.put(pos.immutable(), color.intValue);
+                    }
                 } else {
                     hlBe.put(pos.immutable(), color.intValue);
                 }
@@ -361,8 +368,11 @@ public class LevelRenderer
         public void render(BufferBuilder buffer, PoseStack poseStack, Quaternionf rotation, double cx, double cy, double cz)
         {
             Font font = Minecraft.getInstance().font;
+            BlockPos bpos = BlockPos.containing(x, y, z);
+            Vec3 offset = hlPistonOffsets.get(bpos);
+            double ox = offset != null ? offset.x : 0, oy = offset != null ? offset.y : 0, oz = offset != null ? offset.z : 0;
             poseStack.pushPose();
-            poseStack.translate((float)(x - cx), (float)(y - cy), (float)(z - cz));
+            poseStack.translate((float)(x + ox - cx), (float)(y + oy - cy), (float)(z + oz - cz));
             poseStack.mulPose(rotation);
             poseStack.scale(0.07F, -0.07F, 0.07F);
             MultiBufferSource.BufferSource immediate = Minecraft.getInstance().renderBuffers().bufferSource();
@@ -390,8 +400,11 @@ public class LevelRenderer
         public void render(BufferBuilder buffer, PoseStack poseStack, Quaternionf rotation, double cx, double cy, double cz)
         {
             Font font = Minecraft.getInstance().font;
+            BlockPos bpos = BlockPos.containing(x, y, z);
+            Vec3 offset = hlPistonOffsets.get(bpos);
+            double ox = offset != null ? offset.x : 0, oy = offset != null ? offset.y : 0, oz = offset != null ? offset.z : 0;
             poseStack.pushPose();
-            poseStack.translate((float)(x - cx), (float)(y - cy), (float)(z - cz));
+            poseStack.translate((float)(x + ox - cx), (float)(y + oy - cy), (float)(z + oz - cz));
             poseStack.mulPose(rotation);
             poseStack.scale(0.07F, -0.07F, 0.08F);
             MultiBufferSource.BufferSource immediate = Minecraft.getInstance().renderBuffers().bufferSource();
