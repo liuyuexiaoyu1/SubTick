@@ -32,7 +32,7 @@
 通过 ModMenu 打开配置界面。
 
 <img src=https://github.com/lntricate1/SubTick/assets/29168747/9da7e81e-b24e-4dd2-91ee-dc53a92552e4 width=500>
-<img src=https://github.com/liuyuexiaoyu1/SubTick/assets/29168747/57d667cd-f2fa-4d19-a441-bfca97eaddf8 width=500>
+<img src=https://github.com/lntricate1/SubTick/assets/29168747/57d667cd-f2fa-4d19-a441-bfca97eaddf8 width=500>
 
 ### 显示
 
