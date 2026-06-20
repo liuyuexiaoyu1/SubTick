@@ -2,55 +2,86 @@
 
 [![License](https://img.shields.io/github/license/Fallen-Breath/fabric-mod-template.svg)](http://www.gnu.org/licenses/lgpl-3.0.html)
 
-This mod uses [Fallen's fabric mod template](https://github.com/Fallen-Breath/fabric-mod-template).
+[English](README_EN.md) | [**中文**](README.md)
 
-A carpet extension that allows you to freeze and step to any specific tick phase, as well as step through tile ticks, fluid ticks, block events, entities, and block entities individually. Get it on your client for highlights and a HUD.
+一个 Carpet 扩展模组，允许你将服务器冻结在任意刻阶段，并逐阶段单步执行，也支持逐个单步执行方块刻、流体刻、方块事件、实体和方块实体。在客户端安装可获得高亮显示和 HUD。
 
-<img src=https://github.com/lntricate1/SubTick/assets/29168747/40edd5f1-948e-45a0-80a8-06ac7b4e6deb width="600">
+<img src=https://github.com/liuyuexiaoyu1/SubTick/assets/29168747/40edd5f1-948e-45a0-80a8-06ac7b4e6deb width="600">
 
-## Commands
+## 命令
 
-*[] represents an optional argument, and <> represents an obligatory argument. If an argument is written like `count=1`, that means `1` is the default value.*
+*`[]` 表示可选参数，`<>` 表示必填参数。参数写法如 `count=1` 表示默认值为 `1`。*
 
-- `tick freeze [phase=subtickDefaultPhase]`: Freezes/unfreezes right before `phase`.
-- `tick step [count=1] [phase=subtickDefaultPhase]`: Steps `count` ticks, ending right before `phase`. Supports `tick step 0 [phase]` to step to a later phase in the same tick.
-- `phaseStep [count=1]`: Steps `count` phases forward, **stepping to the next tick if necessary**.
-- `phaseStep <phase>`: Steps to `phase`, **within the current tick**.
-- `phaseStep <phase> force`: Steps to the next `phase` **stepping to the next tick if necessary**.
-- `queueStep <queue> [count=1] [range=subtickDefaultRange]`: Steps through `count` elements in `queue` within`range` blocks, **within the current tick**. Set `range` to `-1` for unlimited range.
-- `queueStep <queue> [count=1] [range=subtickDefaultRange] force`: Steps through `count` elements in `queue` within `range` blocks, **stepping to the next tick if necessary**. Set `range` to `-1` for unlimited range.
+- `tick freeze [phase=subtickDefaultPhase]`：在 `phase` 阶段前冻结/解冻服务器。
+- `tick step [count=1] [phase=subtickDefaultPhase]`：步进 `count` 刻，结束于 `phase` 阶段前。支持 `tick step 0 [phase]` 在同一刻内前进到后续阶段。
+- `phaseStep [count=1]`：向前步进 `count` 个阶段，**必要时进入下一刻**。
+- `phaseStep <phase>`：步进到 `phase` 阶段，**在当前刻内**。
+- `phaseStep <phase> force`：步进到下一个 `phase` 阶段，**必要时进入下一刻**。
+- `queueStep <queue> [count=1] [range=subtickDefaultRange]`：步进 `queue` 中的 `count` 个元素，范围 `range` 格内，**在当前刻内**。设置 `range` 为 `-1` 取消范围限制。
+- `queueStep <queue> [count=1] [range=subtickDefaultRange] force`：同上，但**必要时进入下一刻**。
 
-### Special cases
+### 特殊模式
 
-Block events and block ticks have the option to use a different mode for stepping. Block events can step through whole block event depths, and block ticks can step through whole block tick priorities.
+方块事件和方块刻可选择不同的步进模式。方块事件可按深度步进，方块刻可按优先级步进。
 
 - `queueStep blockEvent [mode=index] [count=1] [range=subtickDefaultRange] [force]`
 - `queueStep blockTick [mode=index] [count=1] [range=subtickDefaultRange] [force]`
 
-## Client config
-To open the config menu, use Modmenu.
+## 客户端配置
 
-<img src=https://github.com/lntricate1/SubTick/assets/29168747/9da7e81e-b24e-4dd2-91ee-dc53a92552e4 width=500>
-<img src=https://github.com/lntricate1/SubTick/assets/29168747/57d667cd-f2fa-4d19-a441-bfca97eaddf8 width=500>
+通过 ModMenu 打开配置界面。
 
-- Stepped: The stuff that has already been stepped through.
-- Stepping: The stuff that got stepped in the most recent queueStep.
-- To Step: The stuff that has not been stepped through yet.
-- Separator: The color used between and around the cells of the table.
-- Position: The color used for the arrow and line indicating the current position in the tick.
-- HUD Alignment: Which edge or corner of the screen the HUD is aligned to.
-- HUD Offset: The offset in pixels from the aligned position.
-- Max Queue Size: The maximum number of queue elements displayed in the HUD.
-- Max Highlight Size: The maximum number of highlighted queue elements in the HUD.
+<img src=https://github.com/liuyuexiaoyu1/SubTick/assets/29168747/9da7e81e-b24e-4dd2-91ee-dc53a92552e4 width=500>
+<img src=https://github.com/liuyuexiaoyu1/SubTick/assets/29168747/57d667cd-f2fa-4d19-a441-bfca97eaddf8 width=500>
 
-## Carpet rules
+### 显示
 
-This mod uses carpet rules for its configuration options. For how to use the text formatting, search for "`format(components, ...)`" in [Auxiliary.md](https://github.com/gnembon/fabric-carpet/blob/master/docs/scarpet/api/Auxiliary.md).
+| 配置项      | 说明                                |
+|----------|-----------------------------------|
+| 显示 HUD   | 控制是否显示刻阶段 HUD                     |
+| HUD 对齐   | HUD 对齐到屏幕的哪个边缘或角落                 |
+| HUD 偏移 X | HUD 的水平偏移像素                       |
+| HUD 偏移 Y | HUD 的垂直偏移像素                       |
+| 最大队列显示数  | HUD 中显示的队列元素最大数量                  |
+| 最大高亮显示数  | HUD 中高亮元素的最大数量。当队列超过显示大小时用于控制高亮数量 |
 
-- `subtickDefaultPhase=blockTick`: The default tick phase to freeze at and step to, if it's not specified in the command.
-- `subtickDefaultRange=32`: The default range within which to queueStep.
-- `subtickTextFormat=ig`: The format for command feedback text.
-- `subtickNumberFormat=iy`: The format for command feedback numbers.
-- `subtickPhaseFormat=it`: The format for command feedback phases.
-- `subtickDimensionFormat=im`: The format for command feedback dimensions.
-- `subtickErrorFormat=ir`: The format for command feedback errors.
+### 渲染
+
+| 配置项   | 说明                                        |
+|-------|-------------------------------------------|
+| 实验性渲染 | 使用新的渲染管线渲染方块高亮（可能存在一些渲染错误）。关闭时使用纯色立方体叠加渲染 |
+
+### 颜色配置
+
+| 配置项    | 说明               |
+|--------|------------------|
+| 已执行背景色 | 已步进通过的内容的背景颜色    |
+| 已执行渲染色 | 已步进通过的内容的高亮渲染颜色  |
+| 已执行文字色 | 已步进通过的内容的文字颜色    |
+| 已执行深度色 | 已步进通过的内容的深度文字颜色  |
+| 执行中背景色 | 正在步进的内容的背景颜色     |
+| 执行中渲染色 | 正在步进的内容的高亮渲染颜色   |
+| 执行中文字色 | 正在步进的内容的文字颜色     |
+| 执行中深度色 | 正在步进的内容的深度文字颜色   |
+| 待执行背景色 | 尚未步进的内容的背景颜色     |
+| 待执行渲染色 | 尚未步进的内容的高亮渲染颜色   |
+| 待执行文字色 | 尚未步进的内容的文字颜色     |
+| 待执行深度色 | 尚未步进的内容的深度文字颜色   |
+| 新任务背景色 | 新排入队列的内容的背景颜色    |
+| 新任务渲染色 | 新排入队列的内容的高亮渲染颜色  |
+| 新任务文字色 | 新排入队列的内容的文字颜色    |
+| 新任务深度色 | 新排入队列的内容的深度文字颜色  |
+| 分隔线色   | HUD 表格中分隔元素的颜色   |
+| 位置指示色  | 当前刻阶段位置的箭头和指示线颜色 |
+
+## Carpet 规则
+
+本模组使用 Carpet 规则配置选项。关于文本格式的用法，请参见 [Auxiliary.md](https://github.com/gnembon/fabric-carpet/blob/master/docs/scarpet/api/Auxiliary.md) 中的 `format(components, ...)`。
+
+- `subtickDefaultPhase=blockTick`：默认冻结和步进的刻阶段（命令中未指定时使用）。
+- `subtickDefaultRange=32`：queueStep 的默认范围。
+- `subtickTextFormat=ig`：命令反馈文本的格式。
+- `subtickNumberFormat=iy`：命令反馈数字的格式。
+- `subtickPhaseFormat=it`：命令反馈阶段的格式。
+- `subtickDimensionFormat=im`：命令反馈维度的格式。
+- `subtickErrorFormat=ir`：命令反馈错误的格式。
