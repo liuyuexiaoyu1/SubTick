@@ -6,7 +6,7 @@
 
 A Carpet extension that allows you to freeze and step to any specific tick phase, as well as step through block ticks, fluid ticks, block events, entities, and block entities individually. Get it on your client for highlights and a HUD.
 
-<img src=https://github.com/liuyuexiaoyu1/SubTick/assets/29168747/40edd5f1-948e-45a0-80a8-06ac7b4e6deb width="600">
+<img src=https://github.com/lntricate1/SubTick/assets/29168747/40edd5f1-948e-45a0-80a8-06ac7b4e6deb width="600">
 
 ## Commands
 
@@ -31,8 +31,8 @@ Block events and block ticks have the option to use a different mode for steppin
 
 Open the config screen via ModMenu.
 
-<img src=https://github.com/liuyuexiaoyu1/SubTick/assets/29168747/9da7e81e-b24e-4dd2-91ee-dc53a92552e4 width=500>
-<img src=https://github.com/liuyuexiaoyu1/SubTick/assets/29168747/57d667cd-f2fa-4d19-a441-bfca97eaddf8 width=500>
+<img src=https://github.com/lntricate1/SubTick/assets/29168747/9da7e81e-b24e-4dd2-91ee-dc53a92552e4 width=500>
+<img src=https://github.com/lntricate1/SubTick/assets/29168747/57d667cd-f2fa-4d19-a441-bfca97eaddf8 width=500>
 
 ### Display
 

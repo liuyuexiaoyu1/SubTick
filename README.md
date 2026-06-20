@@ -6,7 +6,7 @@
 
 一个 Carpet 扩展模组，允许你将服务器冻结在任意刻阶段，并逐阶段单步执行，也支持逐个单步执行方块刻、流体刻、方块事件、实体和方块实体。在客户端安装可获得高亮显示和 HUD。
 
-<img src=https://github.com/liuyuexiaoyu1/SubTick/assets/29168747/40edd5f1-948e-45a0-80a8-06ac7b4e6deb width="600">
+<img src=https://github.com/lntricate1/SubTick/assets/29168747/40edd5f1-948e-45a0-80a8-06ac7b4e6deb width="600">
 
 ## 命令
 
@@ -31,7 +31,7 @@
 
 通过 ModMenu 打开配置界面。
 
-<img src=https://github.com/liuyuexiaoyu1/SubTick/assets/29168747/9da7e81e-b24e-4dd2-91ee-dc53a92552e4 width=500>
+<img src=https://github.com/lntricate1/SubTick/assets/29168747/9da7e81e-b24e-4dd2-91ee-dc53a92552e4 width=500>
 <img src=https://github.com/liuyuexiaoyu1/SubTick/assets/29168747/57d667cd-f2fa-4d19-a441-bfca97eaddf8 width=500>
 
 ### 显示
