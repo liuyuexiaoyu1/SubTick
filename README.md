@@ -4,7 +4,7 @@
 
 [English](README_EN.md) | [**中文**](README.md)
 
-一个 Carpet 扩展模组，允许你将服务器冻结在任意刻阶段，并逐阶段单步执行，也支持逐个单步执行方块刻、流体刻、方块事件、实体和方块实体。在客户端安装可获得高亮显示和 HUD。
+一个 Carpet 扩展模组，允许你将服务器冻结在任意游戏刻运算阶段，并逐阶段单步执行，也支持逐个单步执行方块刻、流体刻、方块事件、实体和方块实体。在客户端安装可获得高亮显示和 HUD。
 
 <img src=https://github.com/lntricate1/SubTick/assets/29168747/40edd5f1-948e-45a0-80a8-06ac7b4e6deb width="600">
 

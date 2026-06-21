@@ -60,7 +60,9 @@ public class BlockFeatureRendererMixin {
             boolean cutoutLeaves = optionsRenderState.cutoutLeaves;
             BlockQuadOutput blockOutput = ModelBlockRenderer.forceOpaque(cutoutLeaves, blockState) ? solidOutput : output;
             original.call(instance, blockOutput, x, y, z, blockAndTintGetter, pos, blockState, blockStateModel, l);
+            return;
         }
+        original.call(instance, blockQuadOutput, x, y, z, blockAndTintGetter, pos, blockState, blockStateModel, l);
     }
 
     @Unique
