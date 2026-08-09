@@ -21,6 +21,7 @@ import net.minecraft.server.level.ServerLevel;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import subtick.ITickHandleable;
 import subtick.TickHandler;
@@ -32,6 +33,7 @@ public class ServerChunkCacheMixin {
     @Final
     ServerLevel level;
 
+    @Unique
     private TickHandler tickHandler()
     {
         return ((ITickHandleable)level.getServer()).tickHandler();
@@ -58,6 +60,6 @@ public class ServerChunkCacheMixin {
     @WrapOperation(method = "tickChunks", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/ServerTickRateManager;runsNormally()Z"))
     private boolean tickChunks(ServerTickRateManager instance, Operation<Boolean> original) {
         //#endif
-        return tickHandler().shouldTick(level, TickPhase.CHUNK) || this.level.getServer().tickRateManager().runsNormally();
+        return tickHandler().shouldTick(level, TickPhase.CHUNK);
     }
 }
