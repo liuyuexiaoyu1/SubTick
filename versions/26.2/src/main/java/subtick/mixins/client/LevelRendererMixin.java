@@ -1,15 +1,17 @@
 package subtick.mixins.client;
 
+//#if MC >= 26.3
+//$$ import com.mojang.renderpearl.api.buffers.GpuBufferSlice;
+//#else
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
+//#endif
 import com.mojang.blaze3d.resource.GraphicsResourceAllocator;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.RenderBuffers;
 import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.state.level.LevelRenderState;
-import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
 import org.joml.Matrix4fc;
 import org.joml.Vector4f;
 import org.spongepowered.asm.mixin.Final;
@@ -18,7 +20,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import subtick.client.Configs;
 
 @Mixin(LevelRenderer.class)
 public class LevelRendererMixin
@@ -26,7 +27,7 @@ public class LevelRendererMixin
   @Shadow @Final private SubmitNodeStorage submitNodeStorage;
   @Shadow @Final private LevelRenderState levelRenderState;
 
-  @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/feature/FeatureRenderDispatcher;prepareFrame(Lnet/minecraft/client/renderer/SubmitNodeStorage;)Lnet/minecraft/client/renderer/feature/FeatureRenderDispatcher$PreparedFrame;", shift = At.Shift.BEFORE))
+  @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/feature/FeatureRenderDispatcher;prepareFrame(Lnet/minecraft/client/renderer/SubmitNodeStorage;)Lnet/minecraft/client/renderer/feature/FeatureRenderDispatcher$PreparedFrame;"))
   private void onBeforePrepareFrame(GraphicsResourceAllocator alloc, DeltaTracker delta, boolean renderOutline, CameraRenderState camera, Matrix4fc view, GpuBufferSlice fog, Vector4f fogColor, boolean sky, CallbackInfo ci)
   {
     if (subtick.client.LevelRenderer.hasOutline())

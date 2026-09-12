@@ -9,7 +9,11 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import com.google.gson.Strictness;
 import com.google.gson.stream.JsonReader;
+//#if MC >= 26.3
+//$$ import com.mojang.renderpearl.api.pipeline.RenderPipeline;
+//#else
 import com.mojang.blaze3d.pipeline.RenderPipeline;
+//#endif
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.client.gui.GuiGraphicsExtractor;

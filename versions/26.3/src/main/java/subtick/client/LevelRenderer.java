@@ -8,14 +8,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.renderer.OrderedSubmitNodeCollector;
-import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.SubmitNodeCollection;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.block.MovingBlockRenderState;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
-import net.minecraft.client.renderer.feature.CustomFeatureRenderer;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.feature.CustomFeatureRenderer;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.gizmos.DrawableGizmoPrimitives;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
@@ -26,7 +26,9 @@ import net.minecraft.client.renderer.state.level.QuadParticleRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.UvMapping;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.client.resources.model.geometry.ItemQuads;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
@@ -189,7 +191,7 @@ public class LevelRenderer
                         buffer.addVertex(X, Y, Z).setColor(r, g, b, a).setNormal(0, 1, 0).setLineWidth(1);
                         buffer.addVertex(X, y, Z).setColor(r, g, b, a).setNormal(0, 1, 0).setLineWidth(1);
                     });
-                    collection.alwaysOnTop.submit(submit);
+                    collection.alwaysOnTopGizmos.submit(submit);
                 }
             } else {
                 poseStack.pushPose();
@@ -261,6 +263,11 @@ public class LevelRenderer
         }
 
         @Override
+        public void submitTextBackground(PoseStack poseStack, float x0, float y0, float x1, float y1, int color, Font.DisplayMode displayMode, int lightCoords) {
+            delegate.submitTextBackground(poseStack, x0, y0, x1, y1, color, displayMode, lightCoords);
+        }
+
+        @Override
         public void submitFlame(PoseStack poseStack, EntityRenderState entityRenderState, Quaternionf quaternionf) {
             delegate.submitFlame(poseStack, entityRenderState, quaternionf);
         }
@@ -271,11 +278,13 @@ public class LevelRenderer
         }
 
         @Override
-        public <S> void submitModel(Model<? super S> model, S state, PoseStack poseStack, RenderType renderType,
-                                    int lightCoords, int overlayCoords, int tintedColor, @Nullable TextureAtlasSprite sprite,
-                                    int outlineColor, ModelFeatureRenderer.@Nullable CrumblingOverlay crumblingOverlay) {
-            delegate.submitModel(model, state, poseStack, renderType, lightCoords, overlayCoords,
-                    tintedColor, sprite, this.outlineColor, crumblingOverlay);
+        public <S> void submitModel(Model<? super S> model, S state, PoseStack poseStack, RenderType renderType, int lightCoords, int overlayCoords, int tintedColor, @org.jspecify.annotations.Nullable UvMapping uvMapping, int outlineColor) {
+            delegate.submitModel(model, state, poseStack, renderType, lightCoords, overlayCoords, tintedColor, uvMapping, this.outlineColor);
+        }
+
+        @Override
+        public <S> void submitCrumblingOverlay(Model<? super S> model, S state, PoseStack poseStack, RenderType renderType, int lightCoords, int overlayCoords, int tintedColor, ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
+            delegate.submitCrumblingOverlay(model, state, poseStack, renderType, lightCoords, overlayCoords, tintedColor, crumblingOverlay);
         }
 
         @Override
@@ -289,8 +298,8 @@ public class LevelRenderer
         }
 
         @Override
-        public void submitBreakingBlockModel(PoseStack poseStack, List<BlockStateModelPart> parts, int progress) {
-            delegate.submitBreakingBlockModel(poseStack, parts, progress);
+        public void submitBreakingBlockModel(PoseStack poseStack, List<BlockStateModelPart> parts, int progress, boolean isBlockTranslucent) {
+            delegate.submitBreakingBlockModel(poseStack, parts, progress, isBlockTranslucent);
         }
 
         @Override
@@ -299,12 +308,12 @@ public class LevelRenderer
         }
 
         @Override
-        public void submitItem(PoseStack poseStack, ItemDisplayContext displayContext, int lightCoords, int overlayCoords, int outlineColor, int[] tintLayers, List<BakedQuad> quads, ItemStackRenderState.FoilType foilType) {
+        public void submitItem(PoseStack poseStack, ItemDisplayContext displayContext, int lightCoords, int overlayCoords, int outlineColor, int[] tintLayers, ItemQuads quads, ItemStackRenderState.FoilType foilType) {
             delegate.submitItem(poseStack, displayContext, lightCoords, overlayCoords, this.outlineColor, tintLayers, quads, foilType);
         }
 
         @Override
-        public void submitCustomGeometry(PoseStack poseStack, RenderType renderType, SubmitNodeCollector.CustomGeometryRenderer customGeometryRenderer) {
+        public void submitCustomGeometry(PoseStack poseStack, RenderType renderType, CustomGeometryRenderer customGeometryRenderer) {
             delegate.submitCustomGeometry(poseStack, renderType, customGeometryRenderer);
         }
 
@@ -356,7 +365,7 @@ public class LevelRenderer
             double offZ = offset != null ? offset.z : 0;
             poseStack.pushPose();
             poseStack.translate((float)(x + offX - cx), (float)(y + offY - cy), (float)(z + offZ - cz));
-            poseStack.mulPose(rotation);
+            poseStack.rotate(rotation);
             poseStack.scale(0.07F, -0.07F, 0.07F);
             collector.submitText(poseStack, -font.width(seq)/2F, -font.lineHeight * 0.5F, seq, false, Font.DisplayMode.SEE_THROUGH, 0xF000F0, color.intValue, 0x00000000, 0x00000000);
             poseStack.popPose();
@@ -396,7 +405,7 @@ public class LevelRenderer
 
             poseStack.pushPose();
             poseStack.translate((float)(x + offX - cx), (float)(y + offY - cy), (float)(z + offZ - cz));
-            poseStack.mulPose(rotation);
+            poseStack.rotate(rotation);
             poseStack.scale(0.07F, -0.07F, 0.08F);
             collector.submitText(poseStack, -font.width(seqIndex)/2F, -font.lineHeight * 0.5F, seqIndex, false, Font.DisplayMode.SEE_THROUGH, 0xF000F0, color1, 0x00000000, 0x00000000);
 
