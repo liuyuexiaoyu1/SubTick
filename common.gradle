@@ -37,6 +37,9 @@ repositories {
   maven {
     url "https://maven.nucleoid.xyz/"
   }
+  flatDir {
+    dirs '../../libs'
+  }
 }
 
 dependencies {
